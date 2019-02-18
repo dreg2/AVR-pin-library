@@ -63,11 +63,11 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 		return -1;
 
 	// assign pin struct values
-	pin->avr_pin.pin_reg  = pin_reg;
-	pin->avr_pin.ddr_reg  = (volatile uint8_t *)(pin_reg + 0x01);
-	pin->avr_pin.port_reg = (volatile uint8_t *)(pin_reg + 0x02);
-	pin->avr_pin.pin_bit  = pin_bit;
-	pin->avr_pin.pin_mask = (uint8_t)(_BV(pin_bit));
+	pin->pin_reg  = pin_reg;
+	pin->ddr_reg  = (volatile uint8_t *)(pin_reg + 0x01);
+	pin->port_reg = (volatile uint8_t *)(pin_reg + 0x02);
+	pin->pin_bit  = pin_bit;
+	pin->pin_mask = (uint8_t)(_BV(pin_bit));
 
 	return 0;
 	}
@@ -83,11 +83,11 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 
 	// assign pin struct values from look-up table
 	pin->ard_pin          = pin_num;
-	pin->avr_pin.pin_reg  = avr_bank_lut[pin_lut[pin_num].avr_bank].pin_reg;
-	pin->avr_pin.ddr_reg  = avr_bank_lut[pin_lut[pin_num].avr_bank].ddr_reg;
-	pin->avr_pin.port_reg = avr_bank_lut[pin_lut[pin_num].avr_bank].port_reg;
-	pin->avr_pin.pin_bit  = pin_lut[pin_num].avr_bit;
-	pin->avr_pin.pin_mask = (uint8_t)(_BV(pin->avr_pin.pin_bit));
+	pin->pin_reg  = avr_bank_lut[pin_lut[pin_num].avr_bank].pin_reg;
+	pin->ddr_reg  = avr_bank_lut[pin_lut[pin_num].avr_bank].ddr_reg;
+	pin->port_reg = avr_bank_lut[pin_lut[pin_num].avr_bank].port_reg;
+	pin->pin_bit  = pin_lut[pin_num].avr_bit;
+	pin->pin_mask = (uint8_t)(_BV(pin->pin_bit));
 
 	return 0;
 	}
@@ -99,9 +99,9 @@ void pin_ddr(pin_t *pin, uint8_t ddr)
 	{
 	// set/clear bit in ddr register
 	if (ddr == PIN_OUT)
-		_SFR_IO8(pin->avr_pin.ddr_reg) |= pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->ddr_reg) |= pin->pin_mask;
 	else
-		_SFR_IO8(pin->avr_pin.ddr_reg) &= (uint8_t)~pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -115,9 +115,9 @@ void pin_ddr_ard(uint8_t pin_num, uint8_t ddr)
 
 	// set/clear bit in ddr register
 	if (ddr == PIN_OUT)
-		_SFR_IO8(pin.avr_pin.ddr_reg) |= pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.ddr_reg) |= pin.pin_mask;
 	else
-		_SFR_IO8(pin.avr_pin.ddr_reg) &= (uint8_t)~pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -127,9 +127,9 @@ void pin_out(pin_t *pin, uint8_t out)
 	{
 	// set/clear bit in port register
 	if (out == PIN_HIGH)
-		_SFR_IO8(pin->avr_pin.port_reg) |= pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 	else
-		_SFR_IO8(pin->avr_pin.port_reg) &= (uint8_t)~pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -143,9 +143,9 @@ void pin_out_ard(uint8_t pin_num, uint8_t out)
 
 	// set/clear bit in port register
 	if (out == PIN_HIGH)
-		_SFR_IO8(pin.avr_pin.port_reg) |= pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 	else
-		_SFR_IO8(pin.avr_pin.port_reg) &= (uint8_t)~pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -154,7 +154,7 @@ void pin_out_ard(uint8_t pin_num, uint8_t out)
 int8_t pin_in(pin_t *pin)
 	{
 	// return bit from pin register
-	return (int8_t)(_SFR_IO8(pin->avr_pin.pin_reg) & pin->avr_pin.pin_mask);
+	return (int8_t)(_SFR_IO8(pin->pin_reg) & pin->pin_mask);
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -167,7 +167,7 @@ int8_t pin_in_ard(uint8_t pin_num)
 	if (pin_init_ard(&pin, pin_num) < 0) return -1;
 
 	// return bit from pin register
-	return (int8_t)(_SFR_IO8(pin.avr_pin.pin_reg) & pin.avr_pin.pin_mask);
+	return (int8_t)(_SFR_IO8(pin.pin_reg) & pin.pin_mask);
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -176,19 +176,19 @@ int8_t pin_in_ard(uint8_t pin_num)
 void pin_pue(pin_t *pin, uint8_t pue)
 	{
 	// save ddr register
-	uint8_t ddr_save = _SFR_IO8(pin->avr_pin.ddr_reg);
+	uint8_t ddr_save = _SFR_IO8(pin->ddr_reg);
 
 	// set pin for input
-	_SFR_IO8(pin->avr_pin.ddr_reg) &= (uint8_t)~pin->avr_pin.pin_mask;
+	_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
 
 	// enable/disable pull-up by setting/clearing output bit
 	if (pue == PIN_PUE)
-		_SFR_IO8(pin->avr_pin.port_reg) |= pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 	else
-		_SFR_IO8(pin->avr_pin.port_reg) &= (uint8_t)~pin->avr_pin.pin_mask;
+		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 
 	// restore ddr register
-	_SFR_IO8(pin->avr_pin.ddr_reg) = ddr_save;
+	_SFR_IO8(pin->ddr_reg) = ddr_save;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -201,17 +201,17 @@ void pin_pue_ard(uint8_t pin_num, uint8_t pue)
 	if (pin_init_ard(&pin, pin_num) < 0) return;
 
 	// save ddr register
-	uint8_t ddr_save = _SFR_IO8(pin.avr_pin.ddr_reg);
+	uint8_t ddr_save = _SFR_IO8(pin.ddr_reg);
 
 	// set pin for input
-	_SFR_IO8(pin.avr_pin.ddr_reg) &= (uint8_t)~pin.avr_pin.pin_mask;
+	_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
 
 	// enable/disable pull-up by setting/clearing output bit
 	if (pue == PIN_PUE)
-		_SFR_IO8(pin.avr_pin.port_reg) |= pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 	else
-		_SFR_IO8(pin.avr_pin.port_reg) &= (uint8_t)~pin.avr_pin.pin_mask;
+		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 
 	// restore ddr register
-	_SFR_IO8(pin.avr_pin.ddr_reg) = ddr_save;
+	_SFR_IO8(pin.ddr_reg) = ddr_save;
 	}

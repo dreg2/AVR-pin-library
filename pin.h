@@ -15,22 +15,16 @@
 #define DDR_D  ((volatile uint8_t *)0x0A)
 #define PORT_D ((volatile uint8_t *)0x0B)
 
-// avr pin type
-// note: derference reg pointers with _SFR_IO8 macro in avr/sfrdefs.h included from avr/io.h
-typedef struct avr_pin_s
+// pin type
+// note: dereference reg pointers with _SFR_IO8 macro in avr/sfrdefs.h included from avr/io.h
+typedef struct pin_s
         {
+	uint8_t           ard_pin;   // arduino pin number
         volatile uint8_t *pin_reg;   // pinx register pointer
         volatile uint8_t *ddr_reg;   // ddrx register pointer
         volatile uint8_t *port_reg;  // portx register pointer
         uint8_t           pin_bit;   // pin bit position
         uint8_t           pin_mask;  // pin bit mask
-	} avr_pin_t;
-
-// pin type
-typedef struct pin_s
-        {
-	uint8_t   ard_pin;   // arduino pin number
-	avr_pin_t avr_pin;   // avr pin structure
         } pin_t;
 
 // ddr input/output
