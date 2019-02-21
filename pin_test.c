@@ -15,15 +15,15 @@ int main(void)
 	
 
 	pin_ddr_ard(3, PIN_IN);
-	pin_pue_ard(3, PIN_PUD);
+	pin_pu_ard(3, PIN_PULLUP_DISABLE);
         printf("pin 3 pu disabled\n");
         getchar();
 
-	pin_pue_ard(3, PIN_PUE);
+	pin_pu_ard(3, PIN_PULLUP_ENABLE);
         printf("pin 3 pu enabled\n");
         getchar();
 
-	pin_pue_ard(3, PIN_PUD);
+	pin_pu_ard(3, PIN_PULLUP_DISABLE);
         printf("pin 3 pu disabled\n");
         getchar();
 
@@ -41,8 +41,8 @@ int main(void)
         getchar();
 
 	pin_init(&pin_led, PIN_B, PINB5); // PB5 = led
-	printf("pin test 1: %p %p %p 0x%02hx 0x%02hx\n",
-		pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
+	printf("pin test 1: %d %p %p %p 0x%02hx 0x%02hx\n",
+		pin_led.ard_pin, pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
         getchar();
 
 	pin_ddr(&pin_led, PIN_OUT);
@@ -53,9 +53,10 @@ int main(void)
 		_delay_ms(200);
 		}
 
-	pin_init_ard(&pin_led, 13); // 13 = led
-	printf("pin test 2: %p %p %p 0x%02hx 0x%02hx\n",
-		pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
+//	pin_init_ard(&pin_led, 13); // 13 = led
+	pin_init_ard(&pin_led, PIN_B5); // 13 = led
+	printf("pin test 2: %d %p %p %p 0x%02hx 0x%02hx\n",
+		pin_led.ard_pin, pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
         getchar();
 
 	pin_ddr(&pin_led, PIN_OUT);
