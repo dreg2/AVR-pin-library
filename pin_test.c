@@ -40,8 +40,8 @@ int main(void)
         printf("pin 3 output low\n");
         getchar();
 
-	pin_init(&pin_led, PIN_B, PINB5); // PB5 = led
-	printf("pin test 1: %d %p %p %p 0x%02hx 0x%02hx\n",
+	pin_init(&pin_led, PIN_B_PTR, PINB5); // PB5 = led
+	printf("pin test 1: %d %p %p %p %d 0x%02hx\n",
 		pin_led.ard_pin, pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
         getchar();
 
@@ -54,8 +54,8 @@ int main(void)
 		}
 
 //	pin_init_ard(&pin_led, 13); // 13 = led
-	pin_init_ard(&pin_led, PIN_B5); // 13 = led
-	printf("pin test 2: %d %p %p %p 0x%02hx 0x%02hx\n",
+	pin_init_ard(&pin_led, PIN_B5_ARD); // B5 = led
+	printf("pin test 2: %d %p %p %p %d 0x%02hx\n",
 		pin_led.ard_pin, pin_led.pin_reg, pin_led.ddr_reg, pin_led.port_reg, pin_led.pin_bit, pin_led.pin_mask);
         getchar();
 

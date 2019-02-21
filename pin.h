@@ -5,37 +5,37 @@
 #include <stdio.h>
 
 // pin register addresses and arduino pin numbers
-#define PIN_B  ((volatile uint8_t *)0x03)
-#define DDR_B  ((volatile uint8_t *)0x04)
-#define PORT_B ((volatile uint8_t *)0x05)
-#define PIN_B0  8
-#define PIN_B1  9
-#define PIN_B2 10
-#define PIN_B3 11
-#define PIN_B4 12
-#define PIN_B5 13
+#define PIN_B_PTR  ((volatile uint8_t *)0x03)
+#define DDR_B_PTR  ((volatile uint8_t *)0x04)
+#define PORT_B_PTR ((volatile uint8_t *)0x05)
+#define PIN_B0_ARD  8
+#define PIN_B1_ARD  9
+#define PIN_B2_ARD 10
+#define PIN_B3_ARD 11
+#define PIN_B4_ARD 12
+#define PIN_B5_ARD 13
 
-#define PIN_C  ((volatile uint8_t *)0x06)
-#define DDR_C  ((volatile uint8_t *)0x07)
-#define PORT_C ((volatile uint8_t *)0x08)
-#define PIN_C0 14
-#define PIN_C1 15
-#define PIN_C2 16
-#define PIN_C3 17
-#define PIN_C4 18
-#define PIN_C5 19
+#define PIN_C_PTR  ((volatile uint8_t *)0x06)
+#define DDR_C_PTR  ((volatile uint8_t *)0x07)
+#define PORT_C_PTR ((volatile uint8_t *)0x08)
+#define PIN_C0_ARD 14
+#define PIN_C1_ARD 15
+#define PIN_C2_ARD 16
+#define PIN_C3_ARD 17
+#define PIN_C4_ARD 18
+#define PIN_C5_ARD 19
 
-#define PIN_D  ((volatile uint8_t *)0x09)
-#define DDR_D  ((volatile uint8_t *)0x0A)
-#define PORT_D ((volatile uint8_t *)0x0B)
-#define PIN_D0  0
-#define PIN_D1  1
-#define PIN_D2  2
-#define PIN_D3  3
-#define PIN_D4  4
-#define PIN_D5  5
-#define PIN_D6  6
-#define PIN_D7  7
+#define PIN_D_PTR  ((volatile uint8_t *)0x09)
+#define DDR_D_PTR  ((volatile uint8_t *)0x0A)
+#define PORT_D_PTR ((volatile uint8_t *)0x0B)
+#define PIN_D0_ARD  0
+#define PIN_D1_ARD  1
+#define PIN_D2_ARD  2
+#define PIN_D3_ARD  3
+#define PIN_D4_ARD  4
+#define PIN_D5_ARD  5
+#define PIN_D6_ARD  6
+#define PIN_D7_ARD  7
 
 // pin type
 // note: dereference reg pointers with _SFR_IO8 macro in avr/sfrdefs.h included from avr/io.h

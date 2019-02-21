@@ -8,7 +8,7 @@
 #define PORT_C_IDX 1
 #define PORT_D_IDX 2
 
-// avr pin bank address look-up table
+// avr pin port register pointers look-up table
 struct avr_port_lut_s
         {
         volatile uint8_t *pin_reg;   // pinx register pointer
@@ -16,15 +16,15 @@ struct avr_port_lut_s
         volatile uint8_t *port_reg;  // portx register pointer
         } avr_port_lut[] =
 		{
-		{PIN_B, DDR_B, PORT_B},
-		{PIN_C, DDR_C, PORT_C},
-		{PIN_D, DDR_D, PORT_D}
+		{PIN_B_PTR, DDR_B_PTR, PORT_B_PTR},
+		{PIN_C_PTR, DDR_C_PTR, PORT_C_PTR},
+		{PIN_D_PTR, DDR_D_PTR, PORT_D_PTR}
 		};
 
 // pin look up table - arduino pin number is the index
 struct pin_lut_t
 	{
-        uint8_t   avr_port;  // avr pin bank
+        uint8_t   avr_port;  // avr pin port
 	uint8_t   avr_bit;   // avr bit position
 	} pin_lut[] =
 		{
@@ -63,7 +63,7 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 	for (i = 0; i <  ARRAY_SIZE(avr_port_lut); i++)
 		if (avr_port_lut[i].pin_reg == pin_reg) // found
 			break;
-	if (i >= 3) // not found
+	if (i >= ARRAY_SIZE(avr_port_lut)) // not found
 		return -1;
 
 	// validate pin_bit
@@ -74,14 +74,14 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 	for (i = 0; i < ARRAY_SIZE(pin_lut); i++)
 		if (avr_port_lut[pin_lut[i].avr_port].pin_reg == pin_reg && pin_lut[i].avr_bit == pin_bit) // found
 			break;
-	if (i >= 20) // not found
+	if (i >= ARRAY_SIZE(pin_lut)) // not found
 		return -1;
 
 	// assign pin struct values
 	pin->ard_pin  = i;
-	pin->pin_reg  = pin_reg;
-	pin->ddr_reg  = (volatile uint8_t *)(pin_reg + 0x01);
-	pin->port_reg = (volatile uint8_t *)(pin_reg + 0x02);
+	pin->pin_reg  = avr_port_lut[pin_lut[i].avr_port].pin_reg;
+	pin->ddr_reg  = avr_port_lut[pin_lut[i].avr_port].ddr_reg;
+	pin->port_reg = avr_port_lut[pin_lut[i].avr_port].port_reg;
 	pin->pin_bit  = pin_bit;
 	pin->pin_mask = (uint8_t)(_BV(pin_bit));
 
@@ -98,7 +98,7 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 	pin->ard_pin    = PIN_NOT_USED;
 
 	// validate pin_num
-	if (pin_num > 19)
+	if (pin_num >= ARRAY_SIZE(pin_lut))
 		return -1;
 
 	// assign pin struct values from look-up table
