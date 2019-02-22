@@ -1,5 +1,6 @@
 #include <avr/io.h>
 #include <stdio.h>
+#include <avr/pgmspace.h>
 
 #include "common.h"
 #include "pin.h"
@@ -9,12 +10,12 @@
 #define PORT_D_IDX 2
 
 // avr pin port register pointers look-up table
-struct avr_port_lut_s
+const struct avr_port_lut_s
         {
         volatile uint8_t *pin_reg;   // pinx register pointer
         volatile uint8_t *ddr_reg;   // ddrx register pointer
         volatile uint8_t *port_reg;  // portx register pointer
-        } avr_port_lut[] =
+        } PROGMEM avr_port_lut_i[] =
 		{
 		{PIN_B_PTR, DDR_B_PTR, PORT_B_PTR},
 		{PIN_C_PTR, DDR_C_PTR, PORT_C_PTR},
@@ -22,11 +23,11 @@ struct avr_port_lut_s
 		};
 
 // pin look up table - arduino pin number is the index
-struct pin_lut_t
+const struct pin_lut_s
 	{
         uint8_t   avr_port;  // avr pin port
 	uint8_t   avr_bit;   // avr bit position
-	} pin_lut[] =
+	} PROGMEM pin_lut_i[] =
 		{
 		{PORT_D_IDX, PIND0},
 		{PORT_D_IDX, PIND1},
@@ -55,8 +56,15 @@ struct pin_lut_t
 //----------------------------------------------------------------------------------------------------
 int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 	{
+	// set pin to invalid until validated
 	pin->valid_flag = PIN_INVALID;
 	pin->ard_pin    = PIN_NOT_USED;
+
+	// copy lut arrays from flash memory
+	struct avr_port_lut_s avr_port_lut[ARRAY_SIZE(avr_port_lut_i)]; 
+        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], (ARRAY_SIZE(avr_port_lut)*sizeof(avr_port_lut[0])));
+	struct pin_lut_s pin_lut[ARRAY_SIZE(pin_lut_i)]; 
+        memcpy_P(&pin_lut[0], &pin_lut_i[0], (ARRAY_SIZE(pin_lut)*sizeof(pin_lut[0])));
 
 	// validate pin_reg
 	uint8_t i;
@@ -94,8 +102,15 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 //----------------------------------------------------------------------------------------------------
 int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 	{
+	// set pin to invalid until validated
 	pin->valid_flag = PIN_INVALID;
 	pin->ard_pin    = PIN_NOT_USED;
+
+	// copy lut arrays from flash memory
+	struct avr_port_lut_s avr_port_lut[ARRAY_SIZE(avr_port_lut_i)]; 
+        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], (ARRAY_SIZE(avr_port_lut)*sizeof(avr_port_lut[0])));
+	struct pin_lut_s pin_lut[ARRAY_SIZE(pin_lut_i)]; 
+        memcpy_P(&pin_lut[0], &pin_lut_i[0], (ARRAY_SIZE(pin_lut)*sizeof(pin_lut[0])));
 
 	// validate pin_num
 	if (pin_num >= ARRAY_SIZE(pin_lut))
@@ -188,7 +203,7 @@ int8_t pin_in(pin_t *pin)
 		return -1;
 
 	// return bit from pin register
-	return (int8_t)(_SFR_IO8(pin->pin_reg) & pin->pin_mask);
+	return (int8_t)((_SFR_IO8(pin->pin_reg) & pin->pin_mask) >> pin->pin_bit);
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -201,7 +216,7 @@ int8_t pin_in_ard(uint8_t pin_num)
 	if (pin_init_ard(&pin, pin_num) < 0) return -1;
 
 	// return bit from pin register
-	return (int8_t)(_SFR_IO8(pin.pin_reg) & pin.pin_mask);
+	return (int8_t)((_SFR_IO8(pin.pin_reg) & pin.pin_mask) >> pin.pin_bit);
 	}
 
 //----------------------------------------------------------------------------------------------------
