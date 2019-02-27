@@ -131,14 +131,14 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 //----------------------------------------------------------------------------------------------------
 // pin data direction
 //----------------------------------------------------------------------------------------------------
-void pin_ddr(pin_t *pin, uint8_t ddr)
+void pin_ddr(pin_t *pin, uint8_t pin_value)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
 		return;
 
 	// set/clear bit in ddr register
-	if (ddr == PIN_OUT)
+	if (pin_value == PIN_OUT)
 		_SFR_IO8(pin->ddr_reg) |= pin->pin_mask;
 	else
 		_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
@@ -147,7 +147,7 @@ void pin_ddr(pin_t *pin, uint8_t ddr)
 //----------------------------------------------------------------------------------------------------
 // pin data direction from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_ddr_ard(uint8_t pin_num, uint8_t ddr)
+void pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 	{
 	// initialize pin struct
 	pin_t pin;
@@ -155,39 +155,39 @@ void pin_ddr_ard(uint8_t pin_num, uint8_t ddr)
 		return;
 
 	// set/clear bit in ddr register
-	if (ddr == PIN_OUT)
+	if (pin_value == PIN_OUT)
 		_SFR_IO8(pin.ddr_reg) |= pin.pin_mask;
 	else
 		_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
-// set output pin level
+// set port pin level
 //----------------------------------------------------------------------------------------------------
-void pin_out(pin_t *pin, uint8_t out)
+void pin_port(pin_t *pin, uint8_t pin_value)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
 		return;
 
 	// set/clear bit in port register
-	if (out == PIN_HIGH)
+	if (pin_value == PIN_HIGH)
 		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 	else
 		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 	}
 
 //----------------------------------------------------------------------------------------------------
-// set output pin level from arduino pin number
+// set port pin level from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_out_ard(uint8_t pin_num, uint8_t out)
+void pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 	{
 	// initialize pin struct
 	pin_t pin;
 	if (pin_init_ard(&pin, pin_num) < 0) return;
 
 	// set/clear bit in port register
-	if (out == PIN_HIGH)
+	if (pin_value == PIN_HIGH)
 		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 	else
 		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
@@ -228,9 +228,6 @@ void pin_pu(pin_t *pin, uint8_t pu_flag)
 	if (pin->valid_flag != PIN_VALID)
 		return;
 
-	// save ddr register
-	uint8_t ddr_save = _SFR_IO8(pin->ddr_reg);
-
 	// set pin for input
 	_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
 
@@ -239,9 +236,6 @@ void pin_pu(pin_t *pin, uint8_t pu_flag)
 		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 	else
 		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
-
-	// restore ddr register
-	_SFR_IO8(pin->ddr_reg) = ddr_save;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -253,9 +247,6 @@ void pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
 	pin_t pin;
 	if (pin_init_ard(&pin, pin_num) < 0) return;
 
-	// save ddr register
-	uint8_t ddr_save = _SFR_IO8(pin.ddr_reg);
-
 	// set pin for input
 	_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
 
@@ -264,7 +255,87 @@ void pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
 		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 	else
 		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+	}
 
-	// restore ddr register
-	_SFR_IO8(pin.ddr_reg) = ddr_save;
+//----------------------------------------------------------------------------------------------------
+// set pin state
+//----------------------------------------------------------------------------------------------------
+void pin_state_set(pin_t *pin, uint8_t state)
+	{
+	// check validity
+	if (pin->valid_flag != PIN_VALID)
+		return;
+
+	// set pin state
+	switch (state)
+		{
+		case PIN_IN_HIGHZ:
+			// port = 0, ddr = 0
+			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
+			break;
+
+		case PIN_IN_PULLUP:
+			// port = 1, ddr = 0
+			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
+			break;
+
+		case PIN_OUT_LOW:
+			// port = 0, ddr = 1
+			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  |= pin->pin_mask;
+			break;
+
+		case PIN_OUT_HIGH:
+			// port = 1, ddr = 1
+			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  |= pin->pin_mask;
+			break;
+
+		default:
+			return;
+		}
+	}
+
+//----------------------------------------------------------------------------------------------------
+// set output pin level from arduino pin number
+//----------------------------------------------------------------------------------------------------
+void pin_state_set_ard(uint8_t pin_num, uint8_t state)
+	{
+	// initialize pin struct
+	pin_t pin;
+	if (pin_init_ard(&pin, pin_num) < 0) return;
+
+	// set pin state
+	switch (state)
+		{
+		case PIN_IN_HIGHZ:
+			// port = 0, ddr = 0
+			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
+			break;
+
+		case PIN_IN_PULLUP:
+			// port = 1, ddr = 0
+			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
+			break;
+
+		case PIN_OUT_LOW:
+			// port = 0, ddr = 1
+			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  |= pin.pin_mask;
+			break;
+
+		case PIN_OUT_HIGH:
+			// port = 1, ddr = 1
+			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  |= pin.pin_mask;
+			break;
+
+		default:
+			return;
+		}
+
 	}

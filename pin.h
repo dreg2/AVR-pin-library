@@ -63,15 +63,26 @@ typedef struct pin_s
 #define PIN_LOW  0
 #define PIN_HIGH 1
 
+// pull-up restistor disable/enable flags
+#define PIN_PULLUP_ENABLE  0
+#define PIN_PULLUP_DISABLE 1
+
+// pin states
+#define PIN_IN         0
+#define PIN_IN_HIGHZ   0
+#define PIN_IN_PULLUP  1 
+#define PIN_OUT_LOW    2 
+#define PIN_OUT_HIGH   3 
+
 // functions
 int8_t  pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit);
 int8_t  pin_init_ard(pin_t *pin, uint8_t pin_num);
 
-void    pin_ddr(pin_t *pin, uint8_t ddr);
-void    pin_ddr_ard(uint8_t pin_num, uint8_t ddr);
+void    pin_ddr(pin_t *pin, uint8_t pin_value);
+void    pin_ddr_ard(uint8_t pin_num, uint8_t pin_value);
 
-void    pin_out(pin_t *pin, uint8_t out);
-void    pin_out_ard(uint8_t pin_num, uint8_t out);
+void    pin_port(pin_t *pin, uint8_t pin_value);
+void    pin_port_ard(uint8_t pin_num, uint8_t pin_value);
 
 int8_t  pin_in(pin_t *pin);
 int8_t  pin_in_ard(uint8_t pin_num);
@@ -79,8 +90,7 @@ int8_t  pin_in_ard(uint8_t pin_num);
 void    pin_pu(pin_t *pin, uint8_t pu_flag);
 void    pin_pu_ard(uint8_t pin_num, uint8_t pu_flag);
 
-// pull-up restistor disable/enable flags
-#define PIN_PULLUP_ENABLE  0
-#define PIN_PULLUP_DISABLE 1
+void    pin_state_set(pin_t *pin, uint8_t state);
+void    pin_state_set_ard(uint8_t pin_num, uint8_t state);
 
 #endif // PIN_H_

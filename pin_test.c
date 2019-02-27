@@ -13,32 +13,28 @@ int main(void)
 
 	pin_t pin_test; // test pin
 
-	// pull up test
-	pin_ddr_ard(3, PIN_IN);
-	pin_pu_ard(3, PIN_PULLUP_DISABLE);
-        printf("pin 3 pu disabled\n");
+	// highz test
+	pin_init_ard(&pin_test, 3);
+	pin_state_set(&pin_test, PIN_IN_HIGHZ);
+        printf("pin 3 highz\n");
         getchar();
 
-	pin_pu_ard(3, PIN_PULLUP_ENABLE);
-        printf("pin 3 pu enabled\n");
+	// pullup test
+	pin_init_ard(&pin_test, 3);
+	pin_state_set(&pin_test, PIN_IN_PULLUP);
+        printf("pin 3 pullup\n");
         getchar();
 
-	pin_pu_ard(3, PIN_PULLUP_DISABLE);
-        printf("pin 3 pu disabled\n");
+	// out low test
+	pin_init_ard(&pin_test, 3);
+	pin_state_set(&pin_test, PIN_OUT_LOW);
+        printf("pin 3 out low\n");
         getchar();
 
-	// pin out test
-	pin_ddr_ard(3, PIN_OUT);
-	pin_out_ard(3, PIN_LOW);
-        printf("pin 3 output low\n");
-        getchar();
-
-	pin_out_ard(3, PIN_HIGH);
-        printf("pin 3 output high\n");
-        getchar();
-
-	pin_out_ard(3, PIN_LOW);
-        printf("pin 3 output low\n");
+	// out high test
+	pin_init_ard(&pin_test, 3);
+	pin_state_set(&pin_test, PIN_OUT_HIGH);
+        printf("pin 3 out high\n");
         getchar();
 
 	// pin init test
@@ -66,9 +62,9 @@ int main(void)
 	for (int i = 0; i < 10; i++)
 		{
 		// use lib function to access port reg
-		pin_out(&pin_test, PIN_HIGH);
+		pin_state_set(&pin_test, PIN_OUT_HIGH);
 		_delay_ms(200);
-		pin_out(&pin_test, PIN_LOW);
+		pin_state_set(&pin_test, PIN_OUT_LOW);
 		_delay_ms(200);
 		}
 
@@ -77,7 +73,7 @@ int main(void)
 	printf("pin in test 1: %d %p %p %p %d 0x%02hx\n",
 		pin_test.ard_pin, pin_test.pin_reg, pin_test.ddr_reg, pin_test.port_reg, pin_test.pin_bit, pin_test.pin_mask);
         getchar();
-	pin_ddr(&pin_test, PIN_IN);
+	pin_state_set(&pin_test, PIN_IN_PULLUP);
 	int8_t pin_test_value;
 	pin_test_value = pin_in(&pin_test);
 	printf("pin in 1 = 0x%02hx\n", pin_test_value);
