@@ -138,10 +138,19 @@ void pin_ddr(pin_t *pin, uint8_t pin_value)
 		return;
 
 	// set/clear bit in ddr register
-	if (pin_value == PIN_OUT)
-		_SFR_IO8(pin->ddr_reg) |= pin->pin_mask;
-	else
-		_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+	switch (pin_value)
+		{
+		case PIN_OUT:
+			_SFR_IO8(pin->ddr_reg) |= pin->pin_mask;
+			break;
+
+		case PIN_IN:
+			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -155,10 +164,19 @@ void pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 		return;
 
 	// set/clear bit in ddr register
-	if (pin_value == PIN_OUT)
-		_SFR_IO8(pin.ddr_reg) |= pin.pin_mask;
-	else
-		_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+	switch (pin_value)
+		{
+		case PIN_OUT:
+			_SFR_IO8(pin.ddr_reg) |= pin.pin_mask;
+			break;
+
+		case PIN_IN:
+			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -171,10 +189,19 @@ void pin_port(pin_t *pin, uint8_t pin_value)
 		return;
 
 	// set/clear bit in port register
-	if (pin_value == PIN_HIGH)
-		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
-	else
-		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+	switch (pin_value)
+		{
+		case PIN_HIGH:
+			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
+			break;
+
+		case PIN_LOW:
+			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -187,10 +214,18 @@ void pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 	if (pin_init_ard(&pin, pin_num) < 0) return;
 
 	// set/clear bit in port register
-	if (pin_value == PIN_HIGH)
-		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
-	else
-		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+	switch (pin_value)
+		{
+		case PIN_HIGH:
+			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
+			break;
+		case PIN_LOW:
+			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -228,14 +263,22 @@ void pin_pu(pin_t *pin, uint8_t pu_flag)
 	if (pin->valid_flag != PIN_VALID)
 		return;
 
-	// set pin for input
-	_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
-
 	// enable/disable pull-up by setting/clearing output bit
-	if (pu_flag == PIN_PULLUP_ENABLE)
-		_SFR_IO8(pin->port_reg) |= pin->pin_mask;
-	else
-		_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+	switch (pu_flag)
+		{
+		case PIN_PULLUP_ENABLE:
+			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
+			break;
+
+		case PIN_PULLUP_DISABLE:
+			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -247,14 +290,22 @@ void pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
 	pin_t pin;
 	if (pin_init_ard(&pin, pin_num) < 0) return;
 
-	// set pin for input
-	_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
-
 	// enable/disable pull-up by setting/clearing output bit
-	if (pu_flag == PIN_PULLUP_ENABLE)
-		_SFR_IO8(pin.port_reg) |= pin.pin_mask;
-	else
-		_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+	switch (pu_flag)
+		{
+		case PIN_PULLUP_ENABLE:
+			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
+			break;
+
+		case PIN_PULLUP_DISABLE:
+			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+			break;
+
+		default:
+			return;
+		}
 	}
 
 //----------------------------------------------------------------------------------------------------
