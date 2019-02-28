@@ -62,9 +62,9 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 
 	// copy lut arrays from flash memory
 	struct avr_port_lut_s avr_port_lut[ARRAY_SIZE(avr_port_lut_i)]; 
-        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], (ARRAY_SIZE(avr_port_lut)*sizeof(avr_port_lut[0])));
+        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], sizeof(avr_port_lut));
 	struct pin_lut_s pin_lut[ARRAY_SIZE(pin_lut_i)]; 
-        memcpy_P(&pin_lut[0], &pin_lut_i[0], (ARRAY_SIZE(pin_lut)*sizeof(pin_lut[0])));
+        memcpy_P(&pin_lut[0], &pin_lut_i[0], sizeof(pin_lut));
 
 	// validate pin_reg
 	uint8_t i;
@@ -91,7 +91,7 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 	pin->ddr_reg  = avr_port_lut[pin_lut[i].avr_port].ddr_reg;
 	pin->port_reg = avr_port_lut[pin_lut[i].avr_port].port_reg;
 	pin->pin_bit  = pin_bit;
-	pin->pin_mask = (uint8_t)(_BV(pin_bit));
+	pin->pin_mask = (uint8_t)(1 << pin_bit);
 
 	pin->valid_flag = PIN_VALID;
 	return 0;
@@ -108,9 +108,9 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 
 	// copy lut arrays from flash memory
 	struct avr_port_lut_s avr_port_lut[ARRAY_SIZE(avr_port_lut_i)]; 
-        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], (ARRAY_SIZE(avr_port_lut)*sizeof(avr_port_lut[0])));
+        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], sizeof(avr_port_lut));
 	struct pin_lut_s pin_lut[ARRAY_SIZE(pin_lut_i)]; 
-        memcpy_P(&pin_lut[0], &pin_lut_i[0], (ARRAY_SIZE(pin_lut)*sizeof(pin_lut[0])));
+        memcpy_P(&pin_lut[0], &pin_lut_i[0], sizeof(pin_lut));
 
 	// validate pin_num
 	if (pin_num >= ARRAY_SIZE(pin_lut))
@@ -122,7 +122,7 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 	pin->ddr_reg  = avr_port_lut[pin_lut[pin_num].avr_port].ddr_reg;
 	pin->port_reg = avr_port_lut[pin_lut[pin_num].avr_port].port_reg;
 	pin->pin_bit  = pin_lut[pin_num].avr_bit;
-	pin->pin_mask = (uint8_t)(_BV(pin->pin_bit));
+	pin->pin_mask = (uint8_t)(1 << pin->pin_bit);
 
 	pin->valid_flag = PIN_VALID;
 	return 0;
@@ -131,11 +131,11 @@ int8_t pin_init_ard(pin_t *pin, uint8_t pin_num)
 //----------------------------------------------------------------------------------------------------
 // pin data direction
 //----------------------------------------------------------------------------------------------------
-void pin_ddr(pin_t *pin, uint8_t pin_value)
+int8_t pin_ddr(pin_t *pin, uint8_t pin_value)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
-		return;
+		return -1;
 
 	// set/clear bit in ddr register
 	switch (pin_value)
@@ -149,19 +149,21 @@ void pin_ddr(pin_t *pin, uint8_t pin_value)
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // pin data direction from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
+int8_t pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 	{
 	// initialize pin struct
 	pin_t pin;
 	if (pin_init_ard(&pin, pin_num) < 0)
-		return;
+		return -1;
 
 	// set/clear bit in ddr register
 	switch (pin_value)
@@ -175,18 +177,20 @@ void pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // set port pin level
 //----------------------------------------------------------------------------------------------------
-void pin_port(pin_t *pin, uint8_t pin_value)
+int8_t pin_port(pin_t *pin, uint8_t pin_value)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
-		return;
+		return -1;
 
 	// set/clear bit in port register
 	switch (pin_value)
@@ -200,18 +204,21 @@ void pin_port(pin_t *pin, uint8_t pin_value)
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // set port pin level from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_port_ard(uint8_t pin_num, uint8_t pin_value)
+int8_t pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 	{
 	// initialize pin struct
 	pin_t pin;
-	if (pin_init_ard(&pin, pin_num) < 0) return;
+	if (pin_init_ard(&pin, pin_num) < 0)
+		return -1;
 
 	// set/clear bit in port register
 	switch (pin_value)
@@ -219,13 +226,16 @@ void pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 		case PIN_HIGH:
 			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 			break;
+
 		case PIN_LOW:
 			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -248,7 +258,8 @@ int8_t pin_in_ard(uint8_t pin_num)
 	{
 	// initialize pin struct
 	pin_t pin;
-	if (pin_init_ard(&pin, pin_num) < 0) return -1;
+	if (pin_init_ard(&pin, pin_num) < 0)
+		return -1;
 
 	// return bit from pin register
 	return (int8_t)((_SFR_IO8(pin.pin_reg) & pin.pin_mask) >> pin.pin_bit);
@@ -257,65 +268,70 @@ int8_t pin_in_ard(uint8_t pin_num)
 //----------------------------------------------------------------------------------------------------
 // enable/disable pin pull-up restistors
 //----------------------------------------------------------------------------------------------------
-void pin_pu(pin_t *pin, uint8_t pu_flag)
+int8_t pin_pu(pin_t *pin, uint8_t pu_flag)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
-		return;
+		return -1;
 
 	// enable/disable pull-up by setting/clearing output bit
 	switch (pu_flag)
 		{
 		case PIN_PULLUP_ENABLE:
-			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
 			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 			break;
 
 		case PIN_PULLUP_DISABLE:
-			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
 			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // enable/disable pin pull-up restistors from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
+int8_t pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
 	{
 	// initialize pin struct
 	pin_t pin;
-	if (pin_init_ard(&pin, pin_num) < 0) return;
+	if (pin_init_ard(&pin, pin_num) < 0)
+		return -1;
 
 	// enable/disable pull-up by setting/clearing output bit
 	switch (pu_flag)
 		{
 		case PIN_PULLUP_ENABLE:
-			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
 			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 			break;
 
 		case PIN_PULLUP_DISABLE:
-			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
 			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // set pin state
 //----------------------------------------------------------------------------------------------------
-void pin_state_set(pin_t *pin, uint8_t state)
+int8_t pin_state_set(pin_t *pin, uint8_t state)
 	{
 	// check validity
 	if (pin->valid_flag != PIN_VALID)
-		return;
+		return -1;
 
 	// set pin state
 	switch (state)
@@ -345,18 +361,21 @@ void pin_state_set(pin_t *pin, uint8_t state)
 			break;
 
 		default:
-			return;
+			return -1;
 		}
+
+	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
 // set output pin level from arduino pin number
 //----------------------------------------------------------------------------------------------------
-void pin_state_set_ard(uint8_t pin_num, uint8_t state)
+int8_t pin_state_set_ard(uint8_t pin_num, uint8_t state)
 	{
 	// initialize pin struct
 	pin_t pin;
-	if (pin_init_ard(&pin, pin_num) < 0) return;
+	if (pin_init_ard(&pin, pin_num) < 0)
+		return -1;
 
 	// set pin state
 	switch (state)
@@ -386,7 +405,8 @@ void pin_state_set_ard(uint8_t pin_num, uint8_t state)
 			break;
 
 		default:
-			return;
+			return -1;
 		}
 
+	return 0;
 	}

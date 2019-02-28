@@ -78,19 +78,19 @@ typedef struct pin_s
 int8_t  pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit);
 int8_t  pin_init_ard(pin_t *pin, uint8_t pin_num);
 
-void    pin_ddr(pin_t *pin, uint8_t pin_value);
-void    pin_ddr_ard(uint8_t pin_num, uint8_t pin_value);
+int8_t  pin_ddr(pin_t *pin, uint8_t pin_value);
+int8_t  pin_ddr_ard(uint8_t pin_num, uint8_t pin_value);
 
-void    pin_port(pin_t *pin, uint8_t pin_value);
-void    pin_port_ard(uint8_t pin_num, uint8_t pin_value);
+int8_t  pin_port(pin_t *pin, uint8_t pin_value);
+int8_t  pin_port_ard(uint8_t pin_num, uint8_t pin_value);
 
 int8_t  pin_in(pin_t *pin);
 int8_t  pin_in_ard(uint8_t pin_num);
 
-void    pin_pu(pin_t *pin, uint8_t pu_flag);
-void    pin_pu_ard(uint8_t pin_num, uint8_t pu_flag);
+int8_t  pin_pu(pin_t *pin, uint8_t pu_flag);
+int8_t  pin_pu_ard(uint8_t pin_num, uint8_t pu_flag);
 
-void    pin_state_set(pin_t *pin, uint8_t state);
-void    pin_state_set_ard(uint8_t pin_num, uint8_t state);
+int8_t  pin_state_set(pin_t *pin, uint8_t state);
+int8_t  pin_state_set_ard(uint8_t pin_num, uint8_t state);
 
 #endif // PIN_H_
