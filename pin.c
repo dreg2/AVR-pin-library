@@ -149,6 +149,7 @@ int8_t pin_ddr(pin_t *pin, uint8_t pin_value)
 			break;
 
 		default:
+			// invalid pin value
 			return -1;
 		}
 
@@ -177,6 +178,7 @@ int8_t pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 			break;
 
 		default:
+			// invalid pin value
 			return -1;
 		}
 
@@ -204,6 +206,7 @@ int8_t pin_port(pin_t *pin, uint8_t pin_value)
 			break;
 
 		default:
+			// invalid pin value
 			return -1;
 		}
 
@@ -232,6 +235,7 @@ int8_t pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 			break;
 
 		default:
+			// invalid pin value
 			return -1;
 		}
 
@@ -263,65 +267,6 @@ int8_t pin_in_ard(uint8_t pin_num)
 
 	// return bit from pin register
 	return (int8_t)((_SFR_IO8(pin.pin_reg) & pin.pin_mask) >> pin.pin_bit);
-	}
-
-//----------------------------------------------------------------------------------------------------
-// enable/disable pin pull-up restistors
-//----------------------------------------------------------------------------------------------------
-int8_t pin_pu(pin_t *pin, uint8_t pu_flag)
-	{
-	// check validity
-	if (pin->valid_flag != PIN_VALID)
-		return -1;
-
-	// enable/disable pull-up by setting/clearing output bit
-	switch (pu_flag)
-		{
-		case PIN_PULLUP_ENABLE:
-			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
-			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
-			break;
-
-		case PIN_PULLUP_DISABLE:
-			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
-			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
-			break;
-
-		default:
-			return -1;
-		}
-
-	return 0;
-	}
-
-//----------------------------------------------------------------------------------------------------
-// enable/disable pin pull-up restistors from arduino pin number
-//----------------------------------------------------------------------------------------------------
-int8_t pin_pu_ard(uint8_t pin_num, uint8_t pu_flag)
-	{
-	// initialize pin struct
-	pin_t pin;
-	if (pin_init_ard(&pin, pin_num) < 0)
-		return -1;
-
-	// enable/disable pull-up by setting/clearing output bit
-	switch (pu_flag)
-		{
-		case PIN_PULLUP_ENABLE:
-			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
-			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
-			break;
-
-		case PIN_PULLUP_DISABLE:
-			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
-			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
-			break;
-
-		default:
-			return -1;
-		}
-
-	return 0;
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -361,6 +306,7 @@ int8_t pin_state_set(pin_t *pin, uint8_t state)
 			break;
 
 		default:
+			// invalid state
 			return -1;
 		}
 
@@ -405,6 +351,7 @@ int8_t pin_state_set_ard(uint8_t pin_num, uint8_t state)
 			break;
 
 		default:
+			// invalid state
 			return -1;
 		}
 
