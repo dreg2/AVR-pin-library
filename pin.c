@@ -62,9 +62,9 @@ int8_t pin_init(pin_t *pin, volatile uint8_t *pin_reg, uint8_t pin_bit)
 
 	// copy lut arrays from flash memory
 	struct avr_port_lut_s avr_port_lut[ARRAY_SIZE(avr_port_lut_i)]; 
-        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], sizeof(avr_port_lut));
+        memcpy_P(&avr_port_lut[0], &avr_port_lut_i[0], sizeof avr_port_lut);
 	struct pin_lut_s pin_lut[ARRAY_SIZE(pin_lut_i)]; 
-        memcpy_P(&pin_lut[0], &pin_lut_i[0], sizeof(pin_lut));
+        memcpy_P(&pin_lut[0], &pin_lut_i[0], sizeof pin_lut);
 
 	// validate pin_reg
 	uint8_t i;
