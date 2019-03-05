@@ -2,6 +2,7 @@
 #include <util/delay.h>
 #include <stdio.h>
 
+#include "common.h"
 #include "uart.h"
 #include "pin.h"
 
@@ -38,7 +39,7 @@ int main(void)
         getchar();
 
 	// pin init test
-	pin_init(&pin_test, PIN_B_PTR, PINB5); // PB5 = led
+	pin_init(&pin_test, PINB_PTR, PINB5); // PB5 = led
 	printf("pin test 1: %d %p %p %p %d 0x%02hx\n",
 		pin_test.ard_pin, pin_test.pin_reg, pin_test.ddr_reg, pin_test.port_reg, pin_test.pin_bit, pin_test.pin_mask);
         getchar();
@@ -69,7 +70,7 @@ int main(void)
 		}
 
 	// pin in test
-	pin_init(&pin_test, PIN_B_PTR, PINB1); // PB1
+	pin_init(&pin_test, PINB_PTR, PINB1); // PB1
 	printf("pin in test 1: %d %p %p %p %d 0x%02hx\n",
 		pin_test.ard_pin, pin_test.pin_reg, pin_test.ddr_reg, pin_test.port_reg, pin_test.pin_bit, pin_test.pin_mask);
         getchar();

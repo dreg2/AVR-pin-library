@@ -5,29 +5,17 @@
 #include <stdio.h>
 
 // pin register addresses and arduino pin numbers
-#define PIN_B_PTR  ((volatile uint8_t *)0x03)
-#define DDR_B_PTR  ((volatile uint8_t *)0x04)
-#define PORT_B_PTR ((volatile uint8_t *)0x05)
 #define PIN_B0_ARD  8
 #define PIN_B1_ARD  9
 #define PIN_B2_ARD 10
 #define PIN_B3_ARD 11
 #define PIN_B4_ARD 12
 #define PIN_B5_ARD 13
-
-#define PIN_C_PTR  ((volatile uint8_t *)0x06)
-#define DDR_C_PTR  ((volatile uint8_t *)0x07)
-#define PORT_C_PTR ((volatile uint8_t *)0x08)
 #define PIN_C0_ARD 14
 #define PIN_C1_ARD 15
 #define PIN_C2_ARD 16
 #define PIN_C3_ARD 17
 #define PIN_C4_ARD 18
-#define PIN_C5_ARD 19
-
-#define PIN_D_PTR  ((volatile uint8_t *)0x09)
-#define DDR_D_PTR  ((volatile uint8_t *)0x0A)
-#define PORT_D_PTR ((volatile uint8_t *)0x0B)
 #define PIN_D0_ARD  0
 #define PIN_D1_ARD  1
 #define PIN_D2_ARD  2
