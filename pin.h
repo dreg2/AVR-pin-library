@@ -4,7 +4,18 @@
 #include <stdint.h>
 #include <stdio.h>
 
-// pin register addresses and arduino pin numbers
+// port register pointers (for atmega328p)
+#define PINB_PTR  ((volatile uint8_t *)0x03)
+#define DDRB_PTR  ((volatile uint8_t *)0x04)
+#define PORTB_PTR ((volatile uint8_t *)0x05)
+#define PINC_PTR  ((volatile uint8_t *)0x06)
+#define DDRC_PTR  ((volatile uint8_t *)0x07)
+#define PORTC_PTR ((volatile uint8_t *)0x08)
+#define PIND_PTR  ((volatile uint8_t *)0x09)
+#define DDRD_PTR  ((volatile uint8_t *)0x0A)
+#define PORTD_PTR ((volatile uint8_t *)0x0B)
+
+// arduino pin numbers
 #define PIN_B0_ARD  8
 #define PIN_B1_ARD  9
 #define PIN_B2_ARD 10

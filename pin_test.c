@@ -6,6 +6,8 @@
 #include "uart.h"
 #include "pin.h"
 
+#define TEST_PIN 11
+
 int main(void)
 	{
         uart_init_115200();           // initialize uart
@@ -13,29 +15,26 @@ int main(void)
         getchar();
 
 	pin_t pin_test; // test pin
+	pin_init_ard(&pin_test, TEST_PIN);
 
 	// highz test
-	pin_init_ard(&pin_test, 3);
 	pin_state_set(&pin_test, PIN_IN_HIGHZ);
-        printf("pin 3 highz\n");
+        printf("pin highz\n");
         getchar();
 
 	// pullup test
-	pin_init_ard(&pin_test, 3);
 	pin_state_set(&pin_test, PIN_IN_PULLUP);
-        printf("pin 3 pullup\n");
+        printf("pin pullup\n");
         getchar();
 
 	// out low test
-	pin_init_ard(&pin_test, 3);
 	pin_state_set(&pin_test, PIN_OUT_LOW);
-        printf("pin 3 out low\n");
+        printf("pin out low\n");
         getchar();
 
 	// out high test
-	pin_init_ard(&pin_test, 3);
 	pin_state_set(&pin_test, PIN_OUT_HIGH);
-        printf("pin 3 out high\n");
+        printf("pin out high\n");
         getchar();
 
 	// pin init test
