@@ -3,6 +3,7 @@ TARGET     = pin
 INCLUDES   = $(TARGET).h
 SOURCES    = $(TARGET).c
 LIBS       = -luart
+DEFINES    = -D _SFR_ASM_COMPAT=1
 
 # target specifics
 DEVICE     = atmega328p
@@ -10,8 +11,8 @@ CLOCK      = 16000000
 AVRD_PGMR  = arduino
 AVRD_PORT  = /dev/ttyACM0
 AVRD_PORT2 = /dev/ttyUSB0
-AVRD_BAUD  = 115200
-#AVRD_BAUD  = 57600
+#AVRD_BAUD  = 115200
+AVRD_BAUD  = 57600
 AVRD_FLAGS = -v
 #FUSES      = -U lfuse:w:0xFF:m -U hfuse:w:0xDE:m -U efuse:w:0x05:m
 UART_BAUD  = 115200
@@ -42,7 +43,7 @@ STANDARD   = -std=gnu11
 #OPTIMIZE   = -O2
 INC_DIRS   = -I../../include
 LIB_DIRS   = -L../../lib
-C_FLAGS    = $(STANDARD) $(INC_DIRS) $(DEBUG) $(OPTIMIZE) $(TEMPS)\
+C_FLAGS    = $(STANDARD) $(INC_DIRS) $(DEBUG) $(OPTIMIZE) $(TEMPS) $(DEFINES)\
 		-Os -D F_CPU=$(CLOCK) -mmcu=$(DEVICE) \
 		-W -Wall -pedantic \
 		-Wformat-nonliteral -Wcast-align  \

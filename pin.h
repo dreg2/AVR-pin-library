@@ -1,19 +1,9 @@
 #ifndef PIN_H_
 #define PIN_H_
 
+#include <avr/io.h>
 #include <stdint.h>
-#include <stdio.h>
-
-// port register pointers (for atmega328p)
-#define PINB_PTR  ((volatile uint8_t *)0x03)
-#define DDRB_PTR  ((volatile uint8_t *)0x04)
-#define PORTB_PTR ((volatile uint8_t *)0x05)
-#define PINC_PTR  ((volatile uint8_t *)0x06)
-#define DDRC_PTR  ((volatile uint8_t *)0x07)
-#define PORTC_PTR ((volatile uint8_t *)0x08)
-#define PIND_PTR  ((volatile uint8_t *)0x09)
-#define DDRD_PTR  ((volatile uint8_t *)0x0A)
-#define PORTD_PTR ((volatile uint8_t *)0x0B)
+//#include <stdio.h>
 
 // arduino pin numbers
 #define PIN_B0_ARD  8
@@ -37,7 +27,9 @@
 #define PIN_D7_ARD  7
 
 // pin type
-// note: dereference reg pointers with _SFR_IO8 macro in avr/sfrdefs.h included from avr/io.h
+// notes:
+// if _SFR_ASM_COMPAT is 0, dereference reg pointers with _SFR_IO8 macro in avr/sfrdefs.h included from avr/io.h
+// if _SFR_ASM_COMPAT is 1, dereference reg pointers the standard C way (*)
 typedef struct pin_s
         {
 	uint8_t           valid_flag; // valid flag

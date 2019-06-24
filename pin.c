@@ -9,6 +9,30 @@
 #define PORTC_IDX 1
 #define PORTD_IDX 2
 
+// port register pointers
+#if _SFR_ASM_COMPAT
+#define PINB_PTR  ((volatile uint8_t *)PINB)
+#define DDRB_PTR  ((volatile uint8_t *)DDRB)
+#define PORTB_PTR ((volatile uint8_t *)PORTB)
+#define PINC_PTR  ((volatile uint8_t *)PINC)
+#define DDRC_PTR  ((volatile uint8_t *)DDRC)
+#define PORTC_PTR ((volatile uint8_t *)PORTC)
+#define PIND_PTR  ((volatile uint8_t *)PIND)
+#define DDRD_PTR  ((volatile uint8_t *)DDRD)
+#define PORTD_PTR ((volatile uint8_t *)PORTD)
+#else
+// atmega328p values (other models may be different)
+#define PINB_PTR  ((volatile uint8_t *)0x03)
+#define DDRB_PTR  ((volatile uint8_t *)0x04)
+#define PORTB_PTR ((volatile uint8_t *)0x05)
+#define PINC_PTR  ((volatile uint8_t *)0x06)
+#define DDRC_PTR  ((volatile uint8_t *)0x07)
+#define PORTC_PTR ((volatile uint8_t *)0x08)
+#define PIND_PTR  ((volatile uint8_t *)0x09)
+#define DDRD_PTR  ((volatile uint8_t *)0x0A)
+#define PORTD_PTR ((volatile uint8_t *)0x0B)
+#endif
+
 // avr pin port register pointers look-up table
 const struct avr_port_lut_s
         {
@@ -141,11 +165,19 @@ int8_t pin_ddr(pin_t *pin, uint8_t pin_value)
 	switch (pin_value)
 		{
 		case PIN_OUT:
+#if _SFR_ASM_COMPAT
+			*pin->ddr_reg |= pin->pin_mask;
+#else
 			_SFR_IO8(pin->ddr_reg) |= pin->pin_mask;
+#endif
 			break;
 
 		case PIN_IN:
+#if _SFR_ASM_COMPAT
+			*pin->ddr_reg &= (uint8_t)~pin->pin_mask;
+#else
 			_SFR_IO8(pin->ddr_reg) &= (uint8_t)~pin->pin_mask;
+#endif
 			break;
 
 		default:
@@ -170,11 +202,19 @@ int8_t pin_ddr_ard(uint8_t pin_num, uint8_t pin_value)
 	switch (pin_value)
 		{
 		case PIN_OUT:
+#if _SFR_ASM_COMPAT
+			*pin.ddr_reg |= pin.pin_mask;
+#else
 			_SFR_IO8(pin.ddr_reg) |= pin.pin_mask;
+#endif
 			break;
 
 		case PIN_IN:
+#if _SFR_ASM_COMPAT
+			*pin.ddr_reg &= (uint8_t)~pin.pin_mask;
+#else
 			_SFR_IO8(pin.ddr_reg) &= (uint8_t)~pin.pin_mask;
+#endif
 			break;
 
 		default:
@@ -198,11 +238,19 @@ int8_t pin_port(pin_t *pin, uint8_t pin_value)
 	switch (pin_value)
 		{
 		case PIN_HIGH:
+#if _SFR_ASM_COMPAT
+			*pin->port_reg |= pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
+#endif
 			break;
 
 		case PIN_LOW:
+#if _SFR_ASM_COMPAT
+			*pin->port_reg &= (uint8_t)~pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
+#endif
 			break;
 
 		default:
@@ -227,11 +275,19 @@ int8_t pin_port_ard(uint8_t pin_num, uint8_t pin_value)
 	switch (pin_value)
 		{
 		case PIN_HIGH:
+#if _SFR_ASM_COMPAT
+			*pin.port_reg |= pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
+#endif
 			break;
 
 		case PIN_LOW:
+#if _SFR_ASM_COMPAT
+			*pin.port_reg &= (uint8_t)~pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
+#endif
 			break;
 
 		default:
@@ -252,7 +308,11 @@ int8_t pin_in(pin_t *pin)
 		return -1;
 
 	// return bit from pin register
+#if _SFR_ASM_COMPAT
+	return (int8_t)((*pin->pin_reg & pin->pin_mask) >> pin->pin_bit);
+#else
 	return (int8_t)((_SFR_IO8(pin->pin_reg) & pin->pin_mask) >> pin->pin_bit);
+#endif
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -266,7 +326,11 @@ int8_t pin_in_ard(uint8_t pin_num)
 		return -1;
 
 	// return bit from pin register
+#if _SFR_ASM_COMPAT
+	return (int8_t)((*pin.pin_reg & pin.pin_mask) >> pin.pin_bit);
+#else
 	return (int8_t)((_SFR_IO8(pin.pin_reg) & pin.pin_mask) >> pin.pin_bit);
+#endif
 	}
 
 //----------------------------------------------------------------------------------------------------
@@ -283,26 +347,46 @@ int8_t pin_state_set(pin_t *pin, uint8_t state)
 		{
 		case PIN_IN_HIGHZ:
 			// port = 0, ddr = 0
+#if _SFR_ASM_COMPAT
+			*pin->port_reg &= (uint8_t)~pin->pin_mask;
+			*pin->ddr_reg  &= (uint8_t)~pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
+#endif
 			break;
 
 		case PIN_IN_PULLUP:
 			// port = 1, ddr = 0
+#if _SFR_ASM_COMPAT
+			*pin->port_reg |= pin->pin_mask;
+			*pin->ddr_reg  &= (uint8_t)~pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 			_SFR_IO8(pin->ddr_reg)  &= (uint8_t)~pin->pin_mask;
+#endif
 			break;
 
 		case PIN_OUT_LOW:
 			// port = 0, ddr = 1
+#if _SFR_ASM_COMPAT
+			*pin->port_reg &= (uint8_t)~pin->pin_mask;
+			*pin->ddr_reg  |= pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) &= (uint8_t)~pin->pin_mask;
 			_SFR_IO8(pin->ddr_reg)  |= pin->pin_mask;
+#endif
 			break;
 
 		case PIN_OUT_HIGH:
 			// port = 1, ddr = 1
+#if _SFR_ASM_COMPAT
+			*pin->port_reg |= pin->pin_mask;
+			*pin->ddr_reg  |= pin->pin_mask;
+#else
 			_SFR_IO8(pin->port_reg) |= pin->pin_mask;
 			_SFR_IO8(pin->ddr_reg)  |= pin->pin_mask;
+#endif
 			break;
 
 		default:
@@ -328,26 +412,46 @@ int8_t pin_state_set_ard(uint8_t pin_num, uint8_t state)
 		{
 		case PIN_IN_HIGHZ:
 			// port = 0, ddr = 0
+#if _SFR_ASM_COMPAT
+			*pin.port_reg &= (uint8_t)~pin.pin_mask;
+			*pin.ddr_reg  &= (uint8_t)~pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
+#endif
 			break;
 
 		case PIN_IN_PULLUP:
 			// port = 1, ddr = 0
+#if _SFR_ASM_COMPAT
+			*pin.port_reg |= pin.pin_mask;
+			*pin.ddr_reg  &= (uint8_t)~pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 			_SFR_IO8(pin.ddr_reg)  &= (uint8_t)~pin.pin_mask;
+#endif
 			break;
 
 		case PIN_OUT_LOW:
 			// port = 0, ddr = 1
+#if _SFR_ASM_COMPAT
+			*pin.port_reg &= (uint8_t)~pin.pin_mask;
+			*pin.ddr_reg  |= pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) &= (uint8_t)~pin.pin_mask;
 			_SFR_IO8(pin.ddr_reg)  |= pin.pin_mask;
+#endif
 			break;
 
 		case PIN_OUT_HIGH:
 			// port = 1, ddr = 1
+#if _SFR_ASM_COMPAT
+			*pin.port_reg |= pin.pin_mask;
+			*pin.ddr_reg  |= pin.pin_mask;
+#else
 			_SFR_IO8(pin.port_reg) |= pin.pin_mask;
 			_SFR_IO8(pin.ddr_reg)  |= pin.pin_mask;
+#endif
 			break;
 
 		default:
