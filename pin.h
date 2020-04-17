@@ -1,9 +1,7 @@
 #ifndef PIN_H_
 #define PIN_H_
 
-#include <avr/io.h>
 #include <stdint.h>
-//#include <stdio.h>
 
 // arduino pin numbers
 #define PIN_B0_ARD  8
@@ -17,6 +15,7 @@
 #define PIN_C2_ARD 16
 #define PIN_C3_ARD 17
 #define PIN_C4_ARD 18
+#define PIN_C5_ARD 19
 #define PIN_D0_ARD  0
 #define PIN_D1_ARD  1
 #define PIN_D2_ARD  2

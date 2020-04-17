@@ -1,4 +1,10 @@
+#if defined(PIN_SFR_ASM_COMPAT)
+        #define _SFR_ASM_COMPAT 1
+#else
+        #define _SFR_ASM_COMPAT 0
+#endif
 #include <avr/io.h>
+
 #include <avr/pgmspace.h>
 #include <stdio.h>
 
@@ -11,26 +17,26 @@
 
 // port register pointers
 #if _SFR_ASM_COMPAT
-#define PINB_PTR  ((volatile uint8_t *)PINB)
-#define DDRB_PTR  ((volatile uint8_t *)DDRB)
-#define PORTB_PTR ((volatile uint8_t *)PORTB)
-#define PINC_PTR  ((volatile uint8_t *)PINC)
-#define DDRC_PTR  ((volatile uint8_t *)DDRC)
-#define PORTC_PTR ((volatile uint8_t *)PORTC)
-#define PIND_PTR  ((volatile uint8_t *)PIND)
-#define DDRD_PTR  ((volatile uint8_t *)DDRD)
-#define PORTD_PTR ((volatile uint8_t *)PORTD)
+	#define PINB_PTR  ((volatile uint8_t *)PINB)
+	#define DDRB_PTR  ((volatile uint8_t *)DDRB)
+	#define PORTB_PTR ((volatile uint8_t *)PORTB)
+	#define PINC_PTR  ((volatile uint8_t *)PINC)
+	#define DDRC_PTR  ((volatile uint8_t *)DDRC)
+	#define PORTC_PTR ((volatile uint8_t *)PORTC)
+	#define PIND_PTR  ((volatile uint8_t *)PIND)
+	#define DDRD_PTR  ((volatile uint8_t *)DDRD)
+	#define PORTD_PTR ((volatile uint8_t *)PORTD)
 #else
-// atmega328p values (other models may be different)
-#define PINB_PTR  ((volatile uint8_t *)0x03)
-#define DDRB_PTR  ((volatile uint8_t *)0x04)
-#define PORTB_PTR ((volatile uint8_t *)0x05)
-#define PINC_PTR  ((volatile uint8_t *)0x06)
-#define DDRC_PTR  ((volatile uint8_t *)0x07)
-#define PORTC_PTR ((volatile uint8_t *)0x08)
-#define PIND_PTR  ((volatile uint8_t *)0x09)
-#define DDRD_PTR  ((volatile uint8_t *)0x0A)
-#define PORTD_PTR ((volatile uint8_t *)0x0B)
+	// atmega328p values (other models may be different)
+	#define PINB_PTR  ((volatile uint8_t *)0x03)
+	#define DDRB_PTR  ((volatile uint8_t *)0x04)
+	#define PORTB_PTR ((volatile uint8_t *)0x05)
+	#define PINC_PTR  ((volatile uint8_t *)0x06)
+	#define DDRC_PTR  ((volatile uint8_t *)0x07)
+	#define PORTC_PTR ((volatile uint8_t *)0x08)
+	#define PIND_PTR  ((volatile uint8_t *)0x09)
+	#define DDRD_PTR  ((volatile uint8_t *)0x0A)
+	#define PORTD_PTR ((volatile uint8_t *)0x0B)
 #endif
 
 // avr pin port register pointers look-up table

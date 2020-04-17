@@ -1,9 +1,14 @@
-#include "pin.h"
-
+#if defined(PIN_SFR_ASM_COMPAT)
+        #define _SFR_ASM_COMPAT 1
+#else
+        #define _SFR_ASM_COMPAT 0
+#endif
 #include <avr/io.h>
+
 #include <util/delay.h>
 #include <stdio.h>
 
+#include "pin.h"
 #include "common.h"
 #include "uart.h"
 
@@ -11,7 +16,7 @@
 
 int main(void)
 	{
-        uart_init_115200();           // initialize uart
+        uart_init_baud();           // initialize uart
         printf("uart initialized\n");
         getchar();
 
@@ -57,7 +62,7 @@ int main(void)
 		}
 
 	// pin init arduino test
-//	pin_init_ard(&pin_test, 13); // 13 = led
+//	pin_init_ard(&pin_test, TEST_PIN); // 13 = led
 	pin_init_ard(&pin_test, PIN_B5_ARD); // B5 = led
 	printf("pin test 2: %d %p %p %p %d 0x%02hx\n",
 		pin_test.ard_pin, pin_test.pin_reg, pin_test.ddr_reg, pin_test.port_reg, pin_test.pin_bit, pin_test.pin_mask);
